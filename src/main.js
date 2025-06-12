@@ -86,12 +86,12 @@ map.on("zoomend", (e) => {
 // ).addTo(map);
 
 
-//////////////////////////////////geoserver vector tiles
+//////////////////////////////////geoserver vector tiles with contours_calc/htL:contours_custom_ordenance_v-tiles style
 //////////////////////////////////
 //////////////////////////////////
 // const url = 'http://localhost:8080/geoserver/gwc/service/wmts/rest/htl:contours_calc/htL:contours_custom_ordenance_v-tiles/WebMercatorQuad/{z}/{y}/{x}?format=application/vnd.mapbox-vector-tile';
 // const vectorTileStyling = {
-//   contours_calc: (propreties, zoom) => {
+//   contours_calc: (properties, zoom) => {
 //     const grossCalc = (ele) => {
 //       if (ele % 200 === 0) {
 //         return 2;
@@ -102,7 +102,7 @@ map.on("zoomend", (e) => {
 //       }
 //     }
 //     return {
-//       weight: grossCalc(propreties.elevation),
+//       weight: grossCalc(properties.elevation),
 //       color: '#E0945E'
 //     }
 //   }
@@ -130,10 +130,13 @@ map.on("zoomend", (e) => {
 
 
 
-////////////// con labels from geoserver
-const url = 'http://localhost:8080/geoserver/gwc/service/wmts/rest/htl:contours_calc/htL:contours_custom_ordenance_v-tiles/WebMercatorQuad/{z}/{y}/{x}?&vt-labels=true&vt-label-attributes=elevation&format=application/vnd.mapbox-vector-tile';
+//////////////////////////////////geoserver vector tiles with con labels from geoserver 
+//////////////////////////////////using vt-labels and vt-label-attributes in the style (contours_custom_ordenance_v-tiles_labels)
+//////////////////////////////////parecen venir ambas capas, pero contours_calc_labels directamente no la pinto
+const url = 'http://localhost:8080/geoserver/gwc/service/wmts/rest/htl:contours_calc/htL:contours_custom_ordenance_v-tiles_labels/WebMercatorQuad/{z}/{y}/{x}?&vt-labels=true&vt-label-attributes=elevation&format=application/vnd.mapbox-vector-tile';
 const vectorTileStyling = {
-  contours_calc: (propreties, zoom) => {
+  contours_calc: (properties, zoom) => {
+    console.log('contours_calc properties:', properties);
     const grossCalc = (ele) => {
       if (ele % 200 === 0) {
         return 2;
@@ -144,51 +147,46 @@ const vectorTileStyling = {
       }
     }
     return {
-      weight: grossCalc(propreties.elevation),
+      weight: grossCalc(properties.elevation),
       color: '#E0945E'
     }
   },
-  contours_calc_label: (properties, zoom) => ({
-    //icon: false, // don't draw a circle
-    //text: properties.elevation ? properties.elevation.toString() : '',
-    //textSize: 12,
-    //textFont: 'Arial Unicode MS Regular',
-    //textFill: '#000',
-    //textHaloColor: '#fff',
-    //textHaloWidth: 2,
-    weight: 1,
-    fillColor: "#022c5b",
-    color: "#022c5b",
-    fillOpacity: 0.0,
-    opacity: 0.0
-  })
+  contours_calc_labels: function(properties, zoom) {
+    console.log('contours_calc_labels properties:', properties);
+    return {
+      radius: 5,
+      fillColor: "#ff0000",
+      color: "#000000",
+      weight: 1,
+      fillOpacity: 1,
+      opacity: 0
+    }
+  }
 }
+
+//saca las layers que vienen, igual que en custom-v-tiles-inspector repo
+const vectorTileStyling2 = new Proxy({}, {
+  get(target, layerName) {
+    console.log('Styling layer:', layerName);
+    return (properties, zoom) => ({
+      color: '#ff0',
+      weight: 1,
+      fillOpacity: 0.4
+    });
+  }
+});
 const vectorGrid = L.vectorGrid.protobuf(url, {
   vectorTileLayerStyles: vectorTileStyling,
-  interactive: true
+  interactive: true,
+  // getFeatureId: f => {
+  //   //console.log('Feature:', f);
+  //   return f.id || f.properties && f.properties.elevation;
+  // }
 }).addTo(map);
-
-//no funciona pq layeraddno es para vectorGrid layers
-// const labelMarkers = [];
-// vectorGrid.on('layeradd', function(e) {
-//   if (e.layerName === 'contours_calc_label') {
-//     const latlng = e.layer.getLatLng ? e.layer.getLatLng() : null;
-//     if (latlng && e.layer.properties && e.layer.properties.elevation) {
-//       const marker = L.marker(latlng, {
-//         icon: L.divIcon({
-//           className: 'contour-label',
-//           html: `<span>${e.layer.properties.elevation}</span>`,
-//           iconSize: [30, 16]
-//         })
-//       });
-//       labelMarkers.push(marker);
-//       marker.addTo(map);
-//     }
-//   }
-// });
 
 vectorGrid.on('mouseover', function(e) {
   console.log('Hovered feature properties:', e.layer.properties);
+  console.log('Hovered feature:', e.layerName, e.layer && e.layer.properties);
 
   if (e.layer && e.latlng) {
     L.popup()
