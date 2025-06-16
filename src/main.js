@@ -66,19 +66,19 @@ map.on("zoomend", (e) => {
 //////////////////////////////////geoserver wms
 //////////////////////////////////
 //////////////////////////////////
-// L.tileLayer.wms('http://localhost:8080/geoserver/htl/wms?', {
-//   layers: 'contours_calc',
-//   format: 'image/png',
-//   version: '1.3.0',
-//   styles: 'contours_custom_ordenance',
-//   transparent: true,
-// }).addTo(map);
+L.tileLayer.wms('http://localhost:8080/geoserver/htl/wms?', {
+  layers: 'curvas_nivel_calc',
+  format: 'image/png',
+  version: '1.3.0',
+  styles: 'curvas_nivel_ordenance',
+  transparent: true,
+}).addTo(map);
 
 //////////////////////////////////geoserver wmts
 //////////////////////////////////
 //////////////////////////////////
 // L.tileLayer(
-//   'http://localhost:8080/geoserver/gwc/service/wmts/rest/htl:contours_calc/htl:contours_custom_ordenance/WebMercatorQuad/{z}/{y}/{x}?format=image/png',
+//   'http://localhost:8080/geoserver/gwc/service/wmts/rest/htl:curvas_nivel_calc/htl:curvas_nivel_ordenance/WebMercatorQuad/{z}/{y}/{x}?format=image/png',
 //   {
 //     tileSize: 256,
 //     attribution: 'GeoServer WMTS'
@@ -133,72 +133,72 @@ map.on("zoomend", (e) => {
 //////////////////////////////////geoserver vector tiles with con labels from geoserver 
 //////////////////////////////////using vt-labels and vt-label-attributes in the style (contours_custom_ordenance_v-tiles_labels)
 //////////////////////////////////parecen venir ambas capas, pero contours_calc_labels directamente no la pinto
-const url = 'http://localhost:8080/geoserver/gwc/service/wmts/rest/htl:contours_calc/htL:contours_custom_ordenance_v-tiles_labels/WebMercatorQuad/{z}/{y}/{x}?&vt-labels=true&vt-label-attributes=elevation&format=application/vnd.mapbox-vector-tile';
-const vectorTileStyling = {
-  contours_calc: (properties, zoom) => {
-    console.log('contours_calc properties:', properties);
-    const grossCalc = (ele) => {
-      if (ele % 200 === 0) {
-        return 2;
-      } else if (ele % 100 === 0) {
-        return 1;
-      } else {
-        return 0.5;
-      }
-    }
-    return {
-      weight: grossCalc(properties.elevation),
-      color: '#E0945E'
-    }
-  },
-  contours_calc_labels: function(properties, zoom) {
-    console.log('contours_calc_labels properties:', properties);
-    return {
-      radius: 5,
-      fillColor: "#ff0000",
-      color: "#000000",
-      weight: 1,
-      fillOpacity: 1,
-      opacity: 0
-    }
-  }
-}
+// const url = 'http://localhost:8080/geoserver/gwc/service/wmts/rest/htl:contours_calc/htL:contours_custom_ordenance_v-tiles_labels/WebMercatorQuad/{z}/{y}/{x}?&vt-labels=true&vt-label-attributes=elevation&format=application/vnd.mapbox-vector-tile';
+// const vectorTileStyling = {
+//   contours_calc: (properties, zoom) => {
+//     console.log('contours_calc properties:', properties);
+//     const grossCalc = (ele) => {
+//       if (ele % 200 === 0) {
+//         return 2;
+//       } else if (ele % 100 === 0) {
+//         return 1;
+//       } else {
+//         return 0.5;
+//       }
+//     }
+//     return {
+//       weight: grossCalc(properties.elevation),
+//       color: '#E0945E'
+//     }
+//   },
+//   contours_calc_labels: function(properties, zoom) {
+//     console.log('contours_calc_labels properties:', properties);
+//     return {
+//       radius: 5,
+//       fillColor: "#ff0000",
+//       color: "#000000",
+//       weight: 1,
+//       fillOpacity: 1,
+//       opacity: 0
+//     }
+//   }
+// }
 
-//saca las layers que vienen, igual que en custom-v-tiles-inspector repo
-const vectorTileStyling2 = new Proxy({}, {
-  get(target, layerName) {
-    console.log('Styling layer:', layerName);
-    return (properties, zoom) => ({
-      color: '#ff0',
-      weight: 1,
-      fillOpacity: 0.4
-    });
-  }
-});
-const vectorGrid = L.vectorGrid.protobuf(url, {
-  vectorTileLayerStyles: vectorTileStyling,
-  interactive: true,
-  // getFeatureId: f => {
-  //   //console.log('Feature:', f);
-  //   return f.id || f.properties && f.properties.elevation;
-  // }
-}).addTo(map);
+// //saca las layers que vienen, igual que en custom-v-tiles-inspector repo
+// const vectorTileStyling2 = new Proxy({}, {
+//   get(target, layerName) {
+//     console.log('Styling layer:', layerName);
+//     return (properties, zoom) => ({
+//       color: '#ff0',
+//       weight: 1,
+//       fillOpacity: 0.4
+//     });
+//   }
+// });
+// const vectorGrid = L.vectorGrid.protobuf(url, {
+//   vectorTileLayerStyles: vectorTileStyling,
+//   interactive: true,
+//   // getFeatureId: f => {
+//   //   //console.log('Feature:', f);
+//   //   return f.id || f.properties && f.properties.elevation;
+//   // }
+// }).addTo(map);
 
-vectorGrid.on('mouseover', function(e) {
-  console.log('Hovered feature properties:', e.layer.properties);
-  console.log('Hovered feature:', e.layerName, e.layer && e.layer.properties);
+// vectorGrid.on('mouseover', function(e) {
+//   console.log('Hovered feature properties:', e.layer.properties);
+//   console.log('Hovered feature:', e.layerName, e.layer && e.layer.properties);
 
-  if (e.layer && e.latlng) {
-    L.popup()
-      .setLatLng(e.latlng)
-      .setContent(JSON.stringify(e.layer.properties, null, 2))
-      .openOn(map);
-  }
-});
+//   if (e.layer && e.latlng) {
+//     L.popup()
+//       .setLatLng(e.latlng)
+//       .setContent(JSON.stringify(e.layer.properties, null, 2))
+//       .openOn(map);
+//   }
+// });
 
-vectorGrid.on('mouseout', function(e) {
-  map.closePopup();
-});
+// vectorGrid.on('mouseout', function(e) {
+//   map.closePopup();
+// });
 
 
 //////////////////////////////////vector tiles custom loader v-tiles 
