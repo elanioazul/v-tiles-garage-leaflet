@@ -307,13 +307,13 @@ vectorGrid.on('mouseout', function(e) {
 
 //////////////////////////////////geoserver wms no-tiled
 //////////////////////////////////
-L.wms.overlay('http://localhost:8080/geoserver/htl/wms?', {
-  layers: 'htl:geoboundaries',
-  styles: '',
-  format: 'image/png',
-  transparent: 'true',
-  version: '1.1.0'
-}).addTo(map);
+// L.wms.overlay('http://localhost:8080/geoserver/htl/wms?', {
+//   layers: 'htl:geoboundaries',
+//   styles: '',
+//   format: 'image/png',
+//   transparent: 'true',
+//   version: '1.1.0'
+// }).addTo(map);
 // L.wms.overlay('http://localhost:8080/geoserver/htl/wms?', {
 //   layers: 'htl:geoboundaries_adm0',
 //   styles: 'htl:geoboundaries_adm0',
@@ -345,3 +345,21 @@ L.wms.overlay('http://localhost:8080/geoserver/htl/wms?', {
 //     attribution: 'GeoServer WMTS'
 //   }
 // ).addTo(map);
+
+
+//////////////////////////////////geoserver wmts polygons and wms labels
+//////////////////////////////////
+L.wms.overlay('http://localhost:8080/geoserver/htl/wms?', {
+  layers: 'htl:geoboundaries_adm0',
+  styles: 'htl:geoboundaries_adm0_labels',
+  format: 'image/png',
+  transparent: 'true',
+  version: '1.1.0'
+}).addTo(map);
+L.tileLayer(
+  'http://localhost:8080/geoserver/gwc/service/wmts/rest/htl:geoboundaries_adm0/htl:geoboundaries_adm0_polygons/WebMercatorQuad/{z}/{y}/{x}?format=image/png',
+  {
+    tileSize: 256,
+    attribution: 'GeoServer WMTS'
+  }
+).addTo(map);
