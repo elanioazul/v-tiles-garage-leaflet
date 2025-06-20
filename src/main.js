@@ -1,16 +1,17 @@
 import './style.css'
 import "leaflet/dist/leaflet.css";
 import L from 'leaflet';
+import wms from 'leaflet.wms';
 import "leaflet.vectorgrid";
 
 ////////////////////////////////// commun setup
 //////////////////////////////////
 //////////////////////////////////
 let config = {
-  minZoom: 7,
+  minZoom: 2,
   maxZoom: 18,
 };
-const zoom = 14;
+const zoom = 5;
 const lat = 40.85024106;
 const lng = -3.95526317;
 
@@ -18,11 +19,32 @@ const map = L.map("map", config).setView([lat, lng], zoom);
 
 L.control.scale().addTo(map); 
 
-const osmUrl = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
-const osmAttribution = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+// Patch if not present the wms plugin by attacing the plugin to the L namespace
+if (wms && !L.wms) {
+  L.wms = wms;
+}
+if (!L.wms) {
+  console.error('leaflet.wms plugin is NOT loaded!');
+} else {
+  console.log('leaflet.wms plugin is loaded.');
+}
 
-L.tileLayer(osmUrl, {
-  attribution: osmAttribution,
+
+
+// const osm = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+//   attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+// }).addTo(map);
+
+// const pnoa = L.tileLayer.wms("http://www.ign.es/wms-inspire/pnoa-ma?SERVICE=WMS&", {
+//     layers: "OI.OrthoimageCoverage",
+//     format: 'image/jpeg',
+//     transparent: true,
+//     version: '1.3.0',
+//     attribution: "PNOA WMS. Cedido por © Instituto Geográfico Nacional de España"
+// }).addTo(map);
+
+const esriImagery = L.tileLayer('https://services.arcgisonline.com/arcgis/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+    attribution: 'Source: Esri, Maxar, Earthstar Geographics, and the GIS User Community'
 }).addTo(map);
 
 map.on("zoomend", (e) => {
@@ -244,3 +266,82 @@ vectorGrid.on('mouseout', function(e) {
 //   map.closePopup();
 // });
 
+
+
+//////////////////////////////////
+//ADMIN_DIVISION
+//////////////////////////////////
+
+//////////////////////////////////geoserver wms tiled
+//////////////////////////////////
+// L.tileLayer.wms('http://localhost:8080/geoserver/htl/wms?', {
+//   layers: 'geoboundaries',
+//   format: 'image/png',
+//   version: '1.3.0',
+//   styles: '',
+//   transparent: true,
+//   tiled: false
+// }).addTo(map);
+// L.tileLayer.wms('http://localhost:8080/geoserver/htl/wms?', {
+//   layers: 'htl:geoboundaries_adm0',
+//   format: 'image/png',
+//   version: '1.1.0',
+//   styles: 'htl:geoboundaries_adm0',
+//   transparent: true,
+// }).addTo(map);
+// L.tileLayer.wms('http://localhost:8080/geoserver/htl/wms?', {
+//   layers: 'htl:geoboundaries_adm1',
+//   format: 'image/png',
+//   version: '1.3.0',
+//   styles: 'htl:geoboundaries_adm1',
+//   transparent: true,
+// }).addTo(map);
+// L.tileLayer.wms('http://localhost:8080/geoserver/htl/wms?', {
+//   layers: 'htl:geoboundaries_adm2',
+//   format: 'image/png',
+//   version: '1.3.0',
+//   styles: 'htl:geoboundaries_adm2',
+//   transparent: true,
+// }).addTo(map);
+
+
+//////////////////////////////////geoserver wms no-tiled
+//////////////////////////////////
+L.wms.overlay('http://localhost:8080/geoserver/htl/wms?', {
+  layers: 'htl:geoboundaries',
+  styles: '',
+  format: 'image/png',
+  transparent: 'true',
+  version: '1.1.0'
+}).addTo(map);
+// L.wms.overlay('http://localhost:8080/geoserver/htl/wms?', {
+//   layers: 'htl:geoboundaries_adm0',
+//   styles: 'htl:geoboundaries_adm0',
+//   format: 'image/png',
+//   transparent: 'true',
+//   version: '1.1.0'
+// }).addTo(map);
+// L.wms.overlay('http://localhost:8080/geoserver/htl/wms?', {
+//   layers: 'htl:geoboundaries_adm1',
+//   styles: 'htl:geoboundaries_adm1',
+//   format: 'image/png',
+//   transparent: 'true',
+//   version: '1.1.0'
+// }).addTo(map);
+// L.wms.overlay('http://localhost:8080/geoserver/htl/wms?', {
+//   layers: 'htl:geoboundaries_adm2',
+//   styles: 'htl:geoboundaries_adm2', 
+//   format: 'image/png',
+//   transparent: 'true',
+//   version: '1.1.0'
+// }).addTo(map);
+
+//////////////////////////////////geoserver wmts
+//////////////////////////////////
+// L.tileLayer(
+//   'http://localhost:8080/geoserver/gwc/service/wmts/rest/htl:geoboundaries/WebMercatorQuad/{z}/{y}/{x}?format=image/png',
+//   {
+//     tileSize: 256,
+//     attribution: 'GeoServer WMTS'
+//   }
+// ).addTo(map);
