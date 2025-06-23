@@ -349,14 +349,14 @@ vectorGrid.on('mouseout', function(e) {
 
 //////////////////////////////////geoserver wmts polygons and wms labels
 //////////////////////////////////
-L.wms.overlay('http://localhost:8080/geoserver/htl/wms?', {
+const polygonsLabels = L.wms.overlay('http://localhost:8080/geoserver/htl/wms?', {
   layers: 'htl:geoboundaries_adm0',
   styles: 'htl:geoboundaries_adm0_labels',
   format: 'image/png',
   transparent: 'true',
   version: '1.1.0'
 }).addTo(map);
-L.tileLayer(
+const polygonsGeom = L.tileLayer(
   'http://localhost:8080/geoserver/gwc/service/wmts/rest/htl:geoboundaries_adm0/htl:geoboundaries_adm0_polygons/WebMercatorQuad/{z}/{y}/{x}?format=image/png',
   {
     tileSize: 256,
