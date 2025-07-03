@@ -31,9 +31,9 @@ if (!L.wms) {
 
 
 
-// const osm = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-//   attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-// }).addTo(map);
+const osm = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+}).addTo(map);
 
 // const pnoa = L.tileLayer.wms("http://www.ign.es/wms-inspire/pnoa-ma?SERVICE=WMS&", {
 //     layers: "OI.OrthoimageCoverage",
@@ -43,9 +43,9 @@ if (!L.wms) {
 //     attribution: "PNOA WMS. Cedido por © Instituto Geográfico Nacional de España"
 // }).addTo(map);
 
-const esriImagery = L.tileLayer('https://services.arcgisonline.com/arcgis/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-    attribution: 'Source: Esri, Maxar, Earthstar Geographics, and the GIS User Community'
-}).addTo(map);
+// const esriImagery = L.tileLayer('https://services.arcgisonline.com/arcgis/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+//     attribution: 'Source: Esri, Maxar, Earthstar Geographics, and the GIS User Community'
+// }).addTo(map);
 
 map.on("zoomend", (e) => {
   console.log(e.target._zoom);
@@ -357,6 +357,16 @@ map.on("zoomend", (e) => {
 
 //////////////////////////////////geoserver wmts polygons and wms labels
 //////////////////////////////////
+
+// //ne:countries
+// const geoserverDefaultCountries = L.wms.overlay('http://localhost:8080/geoserver/ne/wms?', {
+//   layers: 'ne:countries',
+//   styles: '',
+//   format: 'image/png',
+//   transparent: 'true',
+//   version: '1.1.0'
+// }).addTo(map);
+
 
 //geoboundaries_adm0
 const polygonsLabels_adm3 = L.wms.overlay('http://localhost:8080/geoserver/htl/wms?', {
