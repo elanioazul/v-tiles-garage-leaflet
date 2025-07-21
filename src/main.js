@@ -48,7 +48,20 @@ const osm = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
 // }).addTo(map);
 
 map.on("zoomend", (e) => {
-  console.log(e.target._zoom);
+  const zoom = e.target.getZoom();
+  
+  // Calculate resolution (meters per pixel) for EPSG:3857
+  const earthCircumference = 40075017; // meters at the equator in Leaflet’s default EPSG:3857 CRS
+  const tileSize = 256; // pixels
+  const resolution = earthCircumference / (tileSize * Math.pow(2, zoom));
+  
+  // Calculate scale denominator using standardized pixel size (0.28 mm = 0.00028 m)
+  const standardizedPixelSize = 0.00028; // meters
+  const scaleDenominator = resolution / standardizedPixelSize;
+  
+  console.log(`Zoom Level: ${zoom}`);
+  console.log(`Resolution: ${resolution.toFixed(6)} meters/pixel`);
+  console.log(`Scale Denominator: ${Math.round(scaleDenominator)}`);
   
 })
 
