@@ -128,18 +128,18 @@ map.on("zoomend", (e) => {
 
 //////////////////////////////////geoserver wmts
 //////////////////////////////////
-// L.tileLayer(
-//   'http://localhost:8080/geoserver/gwc/service/wmts/rest/htl:curvasnivel_opendem/htl:curvasnivel_opendem/WebMercatorQuad/{z}/{y}/{x}?format=image/png',
-//   {
-//     tileSize: 256,
-//     attribution: 'GeoServer WMTS'
-//   }
-// ).addTo(map);
+L.tileLayer(
+  'http://localhost:8080/geoserver/gwc/service/wmts/rest/htl:curvasnivel_opendem/htl:curvasnivel_opendem_improved/WebMercatorQuad/{z}/{y}/{x}?format=image/png',
+  {
+    tileSize: 256,
+    attribution: 'GeoServer WMTS'
+  }
+).addTo(map);
 
 
 //////////////////////////////////geoserver vector tiles curvas nivel geom + wms curvas nivel labels
 //////////////////////////////////
-// const url = 'http://localhost:8080/geoserver/gwc/service/wmts/rest/htl:curvasnivel_opendem/htl:curvasnivel_opendem_v_tiles/WebMercatorQuad/{z}/{y}/{x}?format=application/vnd.mapbox-vector-tile';
+// const url = 'http://localhost:8080/geoserver/gwc/service/wmts/rest/htl:curvasnivel_opendem/htl:curvasnivel_opendem_v_tiles_extra/WebMercatorQuad/{z}/{y}/{x}?format=application/vnd.mapbox-vector-tile';
 // const vectorTileStyling = {
 //   curvasnivel_opendem: (properties, zoom) => {
 //     const grossCalc = (ele) => {
@@ -381,50 +381,50 @@ map.on("zoomend", (e) => {
 // }).addTo(map);
 
 
-//geoboundaries_adm0
-const polygonsLabels_adm3 = L.wms.overlay('http://localhost:8080/geoserver/htl/wms?', {
-  layers: 'htl:geoboundaries_adm0',
-  styles: 'htl:geoboundaries_adm0_labels',
-  format: 'image/png',
-  transparent: 'true',
-  version: '1.1.0'
-}).addTo(map);
-const polygonsGeom_adm3 = L.tileLayer(
-  'http://localhost:8080/geoserver/gwc/service/wmts/rest/htl:geoboundaries_adm0/htl:geoboundaries_adm0_polygons/WebMercatorQuad/{z}/{y}/{x}?format=image/png',
-  {
-    tileSize: 256,
-    attribution: 'GeoServer WMTS'
-  }
-).addTo(map);
+// //geoboundaries_adm0
+// const polygonsLabels_adm3 = L.wms.overlay('http://localhost:8080/geoserver/htl/wms?', {
+//   layers: 'htl:geoboundaries_adm0',
+//   styles: 'htl:geoboundaries_adm0_labels',
+//   format: 'image/png',
+//   transparent: 'true',
+//   version: '1.1.0'
+// }).addTo(map);
+// const polygonsGeom_adm3 = L.tileLayer(
+//   'http://localhost:8080/geoserver/gwc/service/wmts/rest/htl:geoboundaries_adm0/htl:geoboundaries_adm0_polygons/WebMercatorQuad/{z}/{y}/{x}?format=image/png',
+//   {
+//     tileSize: 256,
+//     attribution: 'GeoServer WMTS'
+//   }
+// ).addTo(map);
 
-//geoboundaries_adm1
-const polygonsLabels_adm1 = L.wms.overlay('http://localhost:8080/geoserver/htl/wms?', {
-  layers: 'htl:geoboundaries_adm1',
-  styles: 'htl:geoboundaries_adm1_labels',
-  format: 'image/png',
-  transparent: 'true',
-  version: '1.1.0'
-}).addTo(map);
-const polygonsGeom_adm1 = L.tileLayer(
-  'http://localhost:8080/geoserver/gwc/service/wmts/rest/htl:geoboundaries_adm1/htl:geoboundaries_adm1_polygons/WebMercatorQuad/{z}/{y}/{x}?format=image/png',
-  {
-    tileSize: 256,
-    attribution: 'GeoServer WMTS'
-  }
-).addTo(map);
+// //geoboundaries_adm1
+// const polygonsLabels_adm1 = L.wms.overlay('http://localhost:8080/geoserver/htl/wms?', {
+//   layers: 'htl:geoboundaries_adm1',
+//   styles: 'htl:geoboundaries_adm1_labels',
+//   format: 'image/png',
+//   transparent: 'true',
+//   version: '1.1.0'
+// }).addTo(map);
+// const polygonsGeom_adm1 = L.tileLayer(
+//   'http://localhost:8080/geoserver/gwc/service/wmts/rest/htl:geoboundaries_adm1/htl:geoboundaries_adm1_polygons/WebMercatorQuad/{z}/{y}/{x}?format=image/png',
+//   {
+//     tileSize: 256,
+//     attribution: 'GeoServer WMTS'
+//   }
+// ).addTo(map);
 
-//geoboundaries_adm2
-const polygonsLabels_adm2 = L.wms.overlay('http://localhost:8080/geoserver/htl/wms?', {
-  layers: 'htl:geoboundaries_adm2',
-  styles: 'htl:geoboundaries_adm2_labels',
-  format: 'image/png',
-  transparent: 'true',
-  version: '1.1.0'
-}).addTo(map);
-const polygonsGeom_adm2 = L.tileLayer(
-  'http://localhost:8080/geoserver/gwc/service/wmts/rest/htl:geoboundaries_adm2/htl:geoboundaries_adm2_polygons/WebMercatorQuad/{z}/{y}/{x}?format=image/png',
-  {
-    tileSize: 256,
-    attribution: 'GeoServer WMTS'
-  }
-).addTo(map);
+// //geoboundaries_adm2
+// const polygonsLabels_adm2 = L.wms.overlay('http://localhost:8080/geoserver/htl/wms?', {
+//   layers: 'htl:geoboundaries_adm2',
+//   styles: 'htl:geoboundaries_adm2_labels',
+//   format: 'image/png',
+//   transparent: 'true',
+//   version: '1.1.0'
+// }).addTo(map);
+// const polygonsGeom_adm2 = L.tileLayer(
+//   'http://localhost:8080/geoserver/gwc/service/wmts/rest/htl:geoboundaries_adm2/htl:geoboundaries_adm2_polygons/WebMercatorQuad/{z}/{y}/{x}?format=image/png',
+//   {
+//     tileSize: 256,
+//     attribution: 'GeoServer WMTS'
+//   }
+// ).addTo(map);
