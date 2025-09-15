@@ -29,7 +29,7 @@ if (!L.wms) {
   console.log('leaflet.wms plugin is loaded.');
 }
 
-
+const clickedContours = [];
 
 const osm = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
   attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
@@ -128,62 +128,117 @@ map.on("zoomend", (e) => {
 
 //////////////////////////////////geoserver wmts
 //////////////////////////////////
-L.tileLayer(
-  'http://localhost:8080/geoserver/gwc/service/wmts/rest/htl:curvasnivel_opendem/htl:curvasnivel_opendem_improved/WebMercatorQuad/{z}/{y}/{x}?format=image/png',
-  {
-    tileSize: 256,
-    attribution: 'GeoServer WMTS'
-  }
-).addTo(map);
+// L.tileLayer(
+//   'http://localhost:8080/geoserver/gwc/service/wmts/rest/htl:curvasnivel_opendem/htl:curvasnivel_opendem_improved/WebMercatorQuad/{z}/{y}/{x}?format=image/png',
+//   {
+//     tileSize: 256,
+//     attribution: 'GeoServer WMTS'
+//   }
+// ).addTo(map);
 
 
 //////////////////////////////////geoserver vector tiles curvas nivel geom + wms curvas nivel labels
 //////////////////////////////////
-// const url = 'http://localhost:8080/geoserver/gwc/service/wmts/rest/htl:curvasnivel_opendem/htl:curvasnivel_opendem_v_tiles_extra/WebMercatorQuad/{z}/{y}/{x}?format=application/vnd.mapbox-vector-tile';
-// const vectorTileStyling = {
-//   curvasnivel_opendem: (properties, zoom) => {
-//     const grossCalc = (ele) => {
-//       if (ele % 200 === 0) {
-//         return 2;
-//       } else if (ele % 100 === 0) {
-//         return 1;
-//       } else {
-//         return 0.5;
-//       }
-//     }
-//     return {
-//       weight: grossCalc(properties.elevation),
-//       color: '#E0945E'
-//     }
-//   }
-// }
-// const vectorGrid = L.vectorGrid.protobuf(url, {
-//   vectorTileLayerStyles: vectorTileStyling,
-//   interactive: true
-// }).addTo(map);
+const url = 'http://localhost:8080/geoserver/gwc/service/wmts/rest/htl:curvasnivel_opendem/htl:curvasnivel_opendem_v_tiles_extra/WebMercatorQuad/{z}/{y}/{x}?format=application/vnd.mapbox-vector-tile';
+const vectorTileStyling = {
+  curvasnivel_opendem: (properties, zoom) => {
+    const grossCalc = (ele) => {
+      if (ele % 200 === 0) {
+        return 2;
+      } else if (ele % 100 === 0) {
+        return 1;
+      } else {
+        return 0.5;
+      }
+    }
+    return {
+      weight: grossCalc(properties.elevation),
+      color: '#E0945E'
+    }
+  }
+}
+const vectorGrid = L.vectorGrid.protobuf(url, {
+  vectorTileLayerStyles: vectorTileStyling,
+  interactive: true,
+  getFeatureId: function(feature) {
+    // Adjust based on your actual properties; e.g., if there's a 'fid' or 'id' field
+    console.log(feature);
+    return feature.properties.id;  // Or feature.properties.id, or a combination like feature.properties.elevation + '_' + feature.properties.someOtherProp
+  }
+}).addTo(map);
 
-// const curvasNivelWmsLabels = L.tileLayer.wms('http://localhost:8080/geoserver/htl/wms?', {
-//   layers: 'curvasnivel_opendem',
-//   format: 'image/png',
-//   version: '1.3.0',
-//   styles: 'curvasnivel_opendem_only_labels',
-//   transparent: true,
-// }).addTo(map);
+const curvasNivelWmsLabels = L.tileLayer.wms('http://localhost:8080/geoserver/htl/wms?', {
+  layers: 'curvasnivel_opendem',
+  format: 'image/png',
+  version: '1.3.0',
+  styles: 'curvasnivel_opendem_only_labels',
+  transparent: true,
+}).addTo(map);
 
-// vectorGrid.on('mouseover', function(e) {
-//   console.log('Hovered feature properties:', e.layer.properties);
+// Track the currently highlighted (hovered) and selected (clicked) feature IDs
+let currentHoverId = null;
+let currentSelectedId = null;
 
-//   if (e.layer && e.latlng) {
-//     L.popup()
-//       .setLatLng(e.latlng)
-//       .setContent(JSON.stringify(e.layer.properties, null, 2))
-//       .openOn(map);
-//   }
-// });
+vectorGrid.on('mouseover', function(e) {
+  console.log('Hovered feature properties:', e.layer.properties);
 
-// vectorGrid.on('mouseout', function(e) {
-//   map.closePopup();
-// });
+  if (e.layer && e.latlng) {
+    L.popup()
+      .setLatLng(e.latlng)
+      .setContent(JSON.stringify(e.layer.properties, null, 2))
+      .openOn(map);
+  }
+
+  const id = vectorGrid.options.getFeatureId(e.layer);
+  // Only apply hover style if the feature is not currently selected
+  if (id !== currentHoverId && id !== currentSelectedId) {
+    if (currentHoverId !== null) {
+      vectorGrid.resetFeatureStyle(currentHoverId);
+    }
+    vectorGrid.setFeatureStyle(id, {
+      weight: 1,
+      color: '#eb4034',
+    });
+    currentHoverId = id;
+  }
+});
+
+vectorGrid.on('mouseout', function(e) {
+  map.closePopup();
+
+  if (currentHoverId !== null && currentHoverId !== currentSelectedId) {
+    vectorGrid.resetFeatureStyle(currentHighlightId);
+    currentHighlightId = null;
+  }
+});
+
+vectorGrid.on('click', function (e) {
+  console.log('Clicked feature properties:', e.layer.properties);
+  const id = vectorGrid.options.getFeatureId(e.layer);
+
+  // If the clicked feature is already selected, reset it
+  if (id === currentSelectedId) {
+    vectorGrid.resetFeatureStyle(id);
+    currentSelectedId = null;
+  } else {
+    // Reset previous selected feature, if any
+    if (currentSelectedId !== null) {
+      vectorGrid.resetFeatureStyle(currentSelectedId);
+    }
+    // Apply selected style to the clicked feature
+    vectorGrid.setFeatureStyle(id, {
+      weight: 1,
+      color: '#3449ebff',
+    });
+    currentSelectedId = id;
+  }
+
+  // Ensure hover state is cleared to avoid conflicts
+  if (currentHoverId !== null) {
+    vectorGrid.resetFeatureStyle(currentHoverId);
+    currentHoverId = null;
+  }
+});
 
 
 
