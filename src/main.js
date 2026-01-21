@@ -60,39 +60,73 @@ const baseSwitcher = new L.basemapsSwitcher([
 ], { position: 'topright' }).addTo(map);
 
 
-var imageUrlWMS = `
-http://localhost:8081/geoserver/wms?
-service=WMS
-&version=1.1.1
-&request=GetMap
-&layers=testing_the_waters:treesminas
-&styles=testing_the_waters:treemine
-&bbox=2.193,48.479,2.195,48.482
-&width=500
-&height=500
-&srs=EPSG:4326
-&format=image/gif
-&time=2026-01-12,2026-01-13,2026-01-14
-&transparent=true`
+// var imageUrlWMS = `
+// http://localhost:8081/geoserver/wms?
+// service=WMS
+// &version=1.1.1
+// &request=GetMap
+// &layers=testing_the_waters:treesminas
+// &styles=testing_the_waters:treemine
+// &bbox=2.193,48.479,2.195,48.482
+// &width=500
+// &height=500
+// &srs=EPSG:4326
+// &format=image/gif
+// &time=2026-01-12,2026-01-13,2026-01-14
+// &transparent=true`
 
-//wms/animate endpoint extitnto (https://discourse.osgeo.org/t/wms-animator-options-disapeared/151851)
-var imageUrlAnim1 = `
-http://localhost:8081/geoserver/wms/animate?LAYERS=testing_the_waters:treesminas
-&styles=testing_the_waters:treemine
-&aparam=time
-&avalues=2026-01-12,2026-01-13,2026-01-14
-&format=image/gif;subtype=animated
-&format_options=gif_loop_continuously:true;gif_frames_delay:1000`
+// //wms/animate endpoint extitnto (https://discourse.osgeo.org/t/wms-animator-options-disapeared/151851)
+// var imageUrlAnim1 = `
+// http://localhost:8081/geoserver/wms/animate?LAYERS=testing_the_waters:treesminas
+// &styles=testing_the_waters:treemine
+// &aparam=time
+// &avalues=2026-01-12,2026-01-13,2026-01-14
+// &format=image/gif;subtype=animated
+// &format_options=gif_loop_continuously:true;gif_frames_delay:1000`
 
 
 var errorOverlayUrl = 'https://cdn-icons-png.flaticon.com/512/110/110641.png';
 var latLngBounds = L.latLngBounds([[48.479, 2.193], [48.482, 2.195]]);
 
-var imageLayer = L.imageOverlay(imageUrlWMS, latLngBounds, {
-    opacity: 0.8,
-    errorOverlayUrl: errorOverlayUrl,
-    interactive: true
-}).addTo(map);
+// var imageLayer = L.imageOverlay(imageUrlWMS, latLngBounds, {
+//     opacity: 0.8,
+//     errorOverlayUrl: errorOverlayUrl,
+//     interactive: true
+// }).addTo(map);
+
+var times = ['2026-01-12', '2026-01-13', '2026-01-14'];
+var currentIndex = 0;
+var layer;
+
+function updateAnimation() {
+    var time = times[currentIndex];
+    var url = `
+      http://localhost:8081/geoserver/wms?service=WMS
+      &version=1.1.1&request=GetMap
+      &layers=testing_the_waters:treesminas
+      &styles=testing_the_waters:treemine
+      &bbox=2.193,48.479,2.195,48.482
+      &width=500
+      &height=500
+      &srs=EPSG:4326
+      &format=image/png
+      &transparent=true
+      &time=${time}
+    `;
+    
+    if (layer) map.removeLayer(layer);
+    
+    layer = L.imageOverlay(url, latLngBounds, {
+      opacity: 0.8,
+      errorOverlayUrl: errorOverlayUrl,
+      interactive: true
+    }).addTo(map);
+    
+    currentIndex = (currentIndex + 1) % times.length;
+}
+
+// Change frame every 1 second
+setInterval(updateAnimation, 1000);
 
 //L.rectangle(latLngBounds, {color: "#c31818", weight: 1, fillOpacity: 0.1}).addTo(map);
 
