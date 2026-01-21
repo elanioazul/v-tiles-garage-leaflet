@@ -103,8 +103,8 @@ function updateAnimation() {
     var url = `
       http://localhost:8081/geoserver/wms?service=WMS
       &version=1.1.1&request=GetMap
-      &layers=testing_the_waters:treesminas
-      &styles=testing_the_waters:treemine
+      &layers=testing_the_waters:treesminas,testing_the_waters:treesminascontour
+      &styles=treemine,line
       &bbox=2.193,48.479,2.195,48.482
       &width=500
       &height=500
