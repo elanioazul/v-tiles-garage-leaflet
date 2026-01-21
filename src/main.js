@@ -11,9 +11,9 @@ let config = {
   minZoom: 2,
   maxZoom: 18,
 };
-const zoom = 4;
-const lat = 40.85024106;
-const lng = -3.95526317;
+const zoom = 16;
+const lat = 48.48024880;
+const lng = 2.19373095;
 
 const map = L.map("map", config).setView([lat, lng], zoom);
 
@@ -59,6 +59,43 @@ const baseSwitcher = new L.basemapsSwitcher([
   },
 ], { position: 'topright' }).addTo(map);
 
+
+var imageUrlWMS = `
+http://localhost:8081/geoserver/wms?
+service=WMS
+&version=1.1.1
+&request=GetMap
+&layers=testing_the_waters:treesminas
+&styles=testing_the_waters:treemine
+&bbox=2.193,48.479,2.195,48.482
+&width=500
+&height=500
+&srs=EPSG:4326
+&format=image/gif
+&time=2026-01-12,2026-01-13,2026-01-14
+&transparent=true`
+
+//wms/animate endpoint extitnto (https://discourse.osgeo.org/t/wms-animator-options-disapeared/151851)
+var imageUrlAnim1 = `
+http://localhost:8081/geoserver/wms/animate?LAYERS=testing_the_waters:treesminas
+&styles=testing_the_waters:treemine
+&aparam=time
+&avalues=2026-01-12,2026-01-13,2026-01-14
+&format=image/gif;subtype=animated
+&format_options=gif_loop_continuously:true;gif_frames_delay:1000`
+
+
+var errorOverlayUrl = 'https://cdn-icons-png.flaticon.com/512/110/110641.png';
+var latLngBounds = L.latLngBounds([[48.479, 2.193], [48.482, 2.195]]);
+
+var imageLayer = L.imageOverlay(imageUrlWMS, latLngBounds, {
+    opacity: 0.8,
+    errorOverlayUrl: errorOverlayUrl,
+    interactive: true
+}).addTo(map);
+
+//L.rectangle(latLngBounds, {color: "#c31818", weight: 1, fillOpacity: 0.1}).addTo(map);
+
 // const pnoa = L.tileLayer.wms("http://www.ign.es/wms-inspire/pnoa-ma?SERVICE=WMS&", {
 //     layers: "OI.OrthoimageCoverage",
 //     format: 'image/jpeg',
@@ -98,44 +135,44 @@ map.on("zoomend", (e) => {
 
 //////////////////////////////////vector tiles martin postgres
 //////////////////////////////////
-const url = 'http://localhost:3000/curvasnivel_opendem/{z}/{x}/{y}';
-const vectorTileStyling = {
-  curvasnivel_opendem: (properties, zoom) => {
-    const grossCalc = (ele) => {
-      if (ele % 200 === 0) {
-        return 2;
-      } else if (ele % 100 === 0) {
-        return 1;
-      } else {
-        return 0.5;
-      }
-    }
-    return {
-      weight: grossCalc(properties.elevation),
-      color: '#E0945E'
-    }
-  }
-}
-const vectorGrid = L.vectorGrid.protobuf(url, {
-  vectorTileLayerStyles: vectorTileStyling,
-  interactive: true,
-  minZoom: 15,
-}).addTo(map);
+// const url = 'http://localhost:3000/curvasnivel_opendem/{z}/{x}/{y}';
+// const vectorTileStyling = {
+//   curvasnivel_opendem: (properties, zoom) => {
+//     const grossCalc = (ele) => {
+//       if (ele % 200 === 0) {
+//         return 2;
+//       } else if (ele % 100 === 0) {
+//         return 1;
+//       } else {
+//         return 0.5;
+//       }
+//     }
+//     return {
+//       weight: grossCalc(properties.elevation),
+//       color: '#E0945E'
+//     }
+//   }
+// }
+// const vectorGrid = L.vectorGrid.protobuf(url, {
+//   vectorTileLayerStyles: vectorTileStyling,
+//   interactive: true,
+//   minZoom: 15,
+// }).addTo(map);
 
-vectorGrid.on('mouseover', function(e) {
-  console.log('Hovered feature properties:', e.layer.properties);
+// vectorGrid.on('mouseover', function(e) {
+//   console.log('Hovered feature properties:', e.layer.properties);
 
-  if (e.layer && e.latlng) {
-    L.popup()
-      .setLatLng(e.latlng)
-      .setContent(JSON.stringify(e.layer.properties, ['elevation', 'type'], 2))
-      .openOn(map);
-  }
-});
+//   if (e.layer && e.latlng) {
+//     L.popup()
+//       .setLatLng(e.latlng)
+//       .setContent(JSON.stringify(e.layer.properties, ['elevation', 'type'], 2))
+//       .openOn(map);
+//   }
+// });
 
-vectorGrid.on('mouseout', function(e) {
-  map.closePopup();
-});
+// vectorGrid.on('mouseout', function(e) {
+//   map.closePopup();
+// });
 
 
 
